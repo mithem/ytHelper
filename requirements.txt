@@ -1,0 +1,4 @@
+youtube-dl
+ffmpeg
+eyeD3
+fileloghelper>=0.0.3

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>ytHelper</title>
+    <script>
+      function setCookie(cname, cvalue, exhours) {
+        var d = new Date();
+        d.setTime(d.getTime() + exhours * 60 * 60 * 1000);
+        var expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";";
+      }
+      function getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(";");
+        for (var i = 0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == " ") {
+            c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
+        }
+        return "";
+      }
+      function checkCookie(cname) {
+        var value = getCookie(cname);
+        return value != "";
+      }
+      function ranstr(length = 20) {
+        var result = "";
+        var characters =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+          result += characters.charAt(
+            Math.floor(Math.random() * charactersLength)
+          );
+        }
+        return result;
+      }
+      function getFile() {
+        document.location.href = "/get?token=" + getCookie("token");
+      }
+      function sendURL() {
+        var token = ranstr();
+        setCookie("token", token, 72);
+        var req = new XMLHttpRequest();
+        req.onreadystatechange = function() {
+          if (req.readyState == 4) {
+            if (req.status == 200) {
+              alert("Success");
+            } else if (req.status == 101) {
+              console.info("received processing response from server");
+            } else {
+              alert(
+                "Server response not ok. Status code: " +
+                  req.status.toString() +
+                  "\n\n" +
+                  req.responseText
+              );
+            }
+          }
+        };
+        req.open("POST", "/", true);
+        req.send(
+          JSON.stringify({
+            token: token,
+            url: document.getElementById("inputURL").value
+          })
+        );
+      }
+      function init() {
+        document.getElementById("link").href =
+          "/get?token=" + getCookie("token");
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Welcome to ytHelper (web)</h1>
+    <div class="form">
+      <input type="text" name="url" id="inputURL" placeholder="url" />
+      <button onclick="sendURL()">submit</button>
+      <button onclick="setCookie('token', '')">clear tokens</button>
+      <a id="link" onclick="init()">get file</a>
+    </div>
+  </body>
+  <script>
+    init();
+  </script>
+</html>
